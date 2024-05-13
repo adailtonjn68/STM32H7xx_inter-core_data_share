@@ -31,41 +31,53 @@
 #ifndef CORES_COMMUNICATION_H_
 #define CORES_COMMUNICATION_H_
 
-#ifndef BUFF_CORES_SIZE			// Defines the buffer size to transfer data
-	#define BUFF_CORES_SIZE	32
+
+#ifndef BUFFSHAREDSIZE
+#define BUFFSHAREDSIZE 128
 #endif
 
-typedef struct {
-	// Flags to lock reading or writing
-	unsigned char status_CM4_nreading:1;	// CM4 NOT reading flag
-	unsigned char status_CM4_nwriting:1;	// CM4 NOT writing flag
-	unsigned char status_CM7_nreading:1;	// CM7 NOT reading flag
-	unsigned char status_CM7_nwriting:1;	// CM7 NOT writing flag
-//	unsigned char status_CM7toCM4_has_data:1;
-//	unsigned char status_CM4toCM7_has_data:1;
 
-	unsigned int buff4to7[BUFF_CORES_SIZE];	// Buffer to transfer from core 4 to 7
-	unsigned int buff7to4[BUFF_CORES_SIZE];	// Buffer to transfer from core 7 to 4
-
-	// Stored buffer sizes. MUST BE LESS THAN BUFF_CORES_SIZE
-	unsigned int buff4to7_size;
-	unsigned int buff7to4_size;
-} shared_data_TypeDef;
-
-
-/*
- * Shared data struct
- *
- * It is configured at the beginning of D3 domain, AHB SRAM @ 0x38000000
+/**
+ * @brief Used to clear the buffer locks and their size holders
+ *        It has to be called in only one of the cores
  */
-#define shared_data		((shared_data_TypeDef *) 0x38000000)
+void core_share_init(void);
 
 
-void core_share_init();
-void get_from_M4(unsigned int *buffer);	// Get data from M4 to M7
-void get_from_M7(unsigned int *buffer); // Get data from M7 to M4
-void put_to_M4(unsigned int buffer[], unsigned int buffer_size);	// put data from M7 to M4
-void put_to_M7(unsigned int buffer[], unsigned int buffer_size);	// put data from M4 to M7
+/**
+ * @brief Send data from M7 to M4
+ * @param buffer
+ * @param size
+ * @return -1 if lock is not acquired, otherwise how many items were transfered
+ */
+int put_to_m4(const int *const restrict buffer, const unsigned int size);
+
+
+/**
+ * @brief Get data from M4
+ * @param buffer
+ * @param size
+ * @return -1 if lock is not acquired, otherwise how many items were read
+ */
+int get_from_m4(int *const restrict buffer, unsigned int size);
+
+
+/**
+ * @brief Send data from M4 to M7
+ * @param buffer
+ * @param size
+ * @return -1 if lock is not acquired, otherwise how many items were transfered
+ */
+int put_to_m7(const int *const restrict buffer, const unsigned int size);
+
+
+/**
+ * @brief Get data from M7
+ * @param buffer
+ * @param size
+ * @return -1 if lock is not acquired, otherwise how many items were read
+ */
+int get_from_m7(int *const restrict buffer, unsigned int size);
 
 
 #endif	/* CORES_COMMUNICATION_H_ */
