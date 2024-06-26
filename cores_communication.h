@@ -63,6 +63,13 @@ int get_from_m4(int *const restrict buffer, unsigned int size);
 
 
 /**
+ * @brief Verify whether CM4 has data ready for CM7 to read
+ * @return -1 if lock is not acquired, otherwise how many items are available for reading
+ */
+int m4_has_data(void);
+
+
+/**
  * @brief Send data from M4 to M7
  * @param buffer
  * @param size
@@ -79,5 +86,11 @@ int put_to_m7(const int *const restrict buffer, const unsigned int size);
  */
 int get_from_m7(int *const restrict buffer, unsigned int size);
 
+
+/**
+ * @brief Verify whether CM7 has data ready for CM4 to read
+ * @return -1 if lock is not acquired, otherwise how many items are available for reading
+ */
+int m7_has_data(void);
 
 #endif	/* CORES_COMMUNICATION_H_ */

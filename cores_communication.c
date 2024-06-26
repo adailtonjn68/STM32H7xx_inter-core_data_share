@@ -29,6 +29,12 @@
 
 #include "cores_communication.h"
 #include <stdatomic.h>
+#include <limits.h>
+
+
+#if BUFFSHAREDSIZE > INT_MAX
+#error BUFFSHAREDSIZE must be less than INT_MAX
+#endif
 
 
 struct _shared {
@@ -119,6 +125,27 @@ int get_from_m4(int *const restrict buffer, unsigned int size)
 }
 
 
+/**
+ * @brief Verify whether CM4 has data ready for CM7 to read
+ * @return -1 if lock is not acquired, otherwise how many items are available for reading
+ */
+int m4_has_data(void)
+{
+	int n_items;
+	/* Try and get lock */
+	if (atomic_flag_test_and_set(&shared_data.lock2)) {
+		/* Return -1 in case lock is not acquired (used by other core)*/
+		return -1;
+	}
+
+	n_items = (int)shared_data.buffer2_size;
+
+	/* Clear lock */
+	atomic_flag_clear(&shared_data.lock2);
+
+	return n_items;
+}
+
 
 /**
  * @brief Send data from M4 to M7
@@ -184,3 +211,24 @@ int get_from_m7(int *const restrict buffer, unsigned int size)
 	return size;
 }
 
+
+/**
+ * @brief Verify whether CM7 has data ready for CM4 to read
+ * @return -1 if lock is not acquired, otherwise how many items are available for reading
+ */
+int m7_has_data(void)
+{
+	int n_items;
+	/* Try and get lock */
+	if (atomic_flag_test_and_set(&shared_data.lock1)) {
+		/* Return -1 in case lock is not acquired (used by other core)*/
+		return -1;
+	}
+
+	n_items = (int)shared_data.buffer1_size;
+
+	/* Clear lock */
+	atomic_flag_clear(&shared_data.lock1);
+
+	return n_items;
+}
