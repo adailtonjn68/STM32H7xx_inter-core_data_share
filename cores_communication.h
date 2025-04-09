@@ -50,7 +50,7 @@ void core_share_init(void);
  * @param size
  * @return -1 if lock is not acquired, otherwise how many items were transfered
  */
-int put_to_m4(const int *const restrict buffer, const unsigned int size);
+int put_to_m4(const int *const restrict buffer, unsigned int size);
 
 
 /**
@@ -75,7 +75,7 @@ int m4_has_data(void);
  * @param size
  * @return -1 if lock is not acquired, otherwise how many items were transfered
  */
-int put_to_m7(const int *const restrict buffer, const unsigned int size);
+int put_to_m7(const int *const restrict buffer, unsigned int size);
 
 
 /**

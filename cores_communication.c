@@ -66,19 +66,20 @@ void core_share_init(void)
  * @param size
  * @return -1 if lock is not acquired, otherwise how many items were transfered
  */
-int put_to_m4(const int *const restrict buffer, const unsigned int size)
+int put_to_m4(const int *const restrict buffer, unsigned int size)
 {
 	/* Try and get lock */
 	if (atomic_flag_test_and_set(&shared_data.lock1)) {
-		/* Return -1 in case lock is not acquired (used by other core)*/
+		/* Return -1 in case lock is not acquired (is used by other core) */
 		return -1;
 	}
 
 	/* Limit size of buffer to be transfered to the size of destine buffer */
-	shared_data.buffer1_size = (size <= BUFFSHAREDSIZE) ? size : BUFFSHAREDSIZE;
+	if (size > BUFFSHAREDSIZE) size = BUFFSHAREDSIZE;
+	shared_data.buffer1_size = size;
 
 	/* Copy from buffer[] to shared_data.buffer[] */
-	for (unsigned int i = 0; i < shared_data.buffer1_size; i++) {
+	for (unsigned int i = 0; i < size; i++) {
 		shared_data.buffer1[i] = buffer[i];
 	}
 
@@ -86,7 +87,7 @@ int put_to_m4(const int *const restrict buffer, const unsigned int size)
 	atomic_flag_clear(&shared_data.lock1);
 
 	/* Return how many items were transfered */
-	return shared_data.buffer1_size;
+	return (int)size;
 }
 
 
@@ -100,12 +101,12 @@ int get_from_m4(int *const restrict buffer, unsigned int size)
 {
 	/* Try and get lock */
 	if (atomic_flag_test_and_set(&shared_data.lock2)) {
-		/* Return -1 in case lock is not acquired (used by other core)*/
+		/* Return -1 in case lock is not acquired (is used by other core) */
 		return -1;
 	}
 
 	/* Verify whether we are trying to read more items than are available */
-	if (size >= shared_data.buffer2_size) {
+	if (size > shared_data.buffer2_size) {
 		size = shared_data.buffer2_size;
 	}
 
@@ -121,7 +122,7 @@ int get_from_m4(int *const restrict buffer, unsigned int size)
 	atomic_flag_clear(&shared_data.lock2);
 
 	/* Return how many items were read */
-	return size;
+	return (int)size;
 }
 
 
@@ -134,7 +135,7 @@ int m4_has_data(void)
 	int n_items;
 	/* Try and get lock */
 	if (atomic_flag_test_and_set(&shared_data.lock2)) {
-		/* Return -1 in case lock is not acquired (used by other core)*/
+		/* Return -1 in case lock is not acquired (is used by other core)*/
 		return -1;
 	}
 
@@ -153,19 +154,20 @@ int m4_has_data(void)
  * @param size
  * @return -1 if lock is not acquired, otherwise how many items were transfered
  */
-int put_to_m7(const int *const restrict buffer, const unsigned int size)
+int put_to_m7(const int *const restrict buffer, unsigned int size)
 {
 	/* Try and get lock */
 	if (atomic_flag_test_and_set(&shared_data.lock2)) {
-		/* Return -1 in case lock is not acquired (used by other core)*/
+		/* Return -1 in case lock is not acquired (is used by other core) */
 		return -1;
 	}
 
 	/* Limit size of buffer to be transfered to the size of destine buffer */
-	shared_data.buffer2_size = (size <= BUFFSHAREDSIZE) ? size : BUFFSHAREDSIZE;
+	if (size > BUFFSHAREDSIZE) size = BUFFSHAREDSIZE;
+	shared_data.buffer2_size = size;
 
 	/* Copy from buffer[] to shared_data.buffer[] */
-	for (unsigned int i = 0; i < shared_data.buffer2_size; i++) {
+	for (unsigned int i = 0; i < size; i++) {
 		shared_data.buffer2[i] = buffer[i];
 	}
 
@@ -173,7 +175,7 @@ int put_to_m7(const int *const restrict buffer, const unsigned int size)
 	atomic_flag_clear(&shared_data.lock2);
 
 	/* Return how many items were transfered */
-	return shared_data.buffer2_size;
+	return (int)size;
 }
 
 
@@ -187,12 +189,12 @@ int get_from_m7(int *const restrict buffer, unsigned int size)
 {
 	/* Try and get lock */
 	if (atomic_flag_test_and_set(&shared_data.lock1)) {
-		/* Return -1 in case lock is not acquired (used by other core)*/
+		/* Return -1 in case lock is not acquired (is used by other core) */
 		return -1;
 	}
 
 	/* Verify whether we are trying to read more items than are available */
-	if (size >= shared_data.buffer1_size) {
+	if (size > shared_data.buffer1_size) {
 		size = shared_data.buffer1_size;
 	}
 
@@ -208,7 +210,7 @@ int get_from_m7(int *const restrict buffer, unsigned int size)
 	atomic_flag_clear(&shared_data.lock1);
 
 	/* Return how many items were read */
-	return size;
+	return (int)size;
 }
 
 
@@ -221,7 +223,7 @@ int m7_has_data(void)
 	int n_items;
 	/* Try and get lock */
 	if (atomic_flag_test_and_set(&shared_data.lock1)) {
-		/* Return -1 in case lock is not acquired (used by other core)*/
+		/* Return -1 in case lock is not acquired (is used by other core) */
 		return -1;
 	}
 
