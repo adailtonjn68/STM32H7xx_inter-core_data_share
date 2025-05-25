@@ -3,7 +3,7 @@
  *
  *  Created on: 19 de mar de 2022
  *      Author: Adailton Braga Júnior
- *              adailton.braga@acad.ufsm.br
+ *              adailtonjn68@gmail.com
  *
  *
  * Copyright (c) 2022 Adailton Braga Júnior
