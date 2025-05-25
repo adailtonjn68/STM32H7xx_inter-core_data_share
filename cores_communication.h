@@ -93,4 +93,4 @@ int get_from_m7(int *const restrict buffer, unsigned int size);
  */
 int m7_has_data(void);
 
-#endif	/* CORES_COMMUNICATION_H_ */
+#endif  /* CORES_COMMUNICATION_H_ */
